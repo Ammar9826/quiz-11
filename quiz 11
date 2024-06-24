@@ -1,0 +1,77 @@
+To cluster the Iris dataset based on petal width and length using K-means clustering from scikit-learn, and determine the optimal number of clusters 
+𝑘
+k using the elbow method, follow these steps:
+
+Step 1: Importing necessary libraries and loading the dataset
+import numpy as np
+import matplotlib.pyplot as plt
+from sklearn.cluster import KMeans
+from sklearn.datasets import load_iris
+from sklearn.preprocessing import StandardScaler
+
+# Load the iris dataset
+iris = load_iris()
+X = iris.data[:, 2:4]  # Consider only petal length and petal width
+
+Step 2: Preprocessing (scaling)
+Since K-means clustering is sensitive to the scale of the data, it's beneficial to scale the features.
+# Scale the features using StandardScaler
+scaler = StandardScaler()
+X_scaled = scaler.fit_transform(X)
+
+Step 3: Finding the optimal number of clusters 𝑘 using the elbow method
+The elbow method helps to determine the optimal number of clusters 𝑘 by plotting the within-cluster sum of squares (inertia) against different values of k.
+# Initialize a list to store the values of inertia (within-cluster sum of squares)
+inertia = []
+
+# Define the range of k values to test
+k_values = range(1, 11)
+
+# Fit KMeans for each value of k
+for k in k_values:
+    kmeans = KMeans(n_clusters=k, random_state=42)
+    kmeans.fit(X_scaled)
+    inertia.append(kmeans.inertia_)
+
+# Plot the elbow plot
+plt.figure(figsize=(8, 6))
+plt.plot(k_values, inertia, marker='o', linestyle='-', color='b')
+plt.xlabel('Number of clusters (k)')
+plt.ylabel('Inertia')
+plt.title('Elbow plot for KMeans clustering')
+plt.xticks(k_values)
+plt.show()
+
+Step 4: Interpretation of the elbow plot
+The elbow plot helps us determine the optimal value of k. The optimal k is usually where the inertia begins to decrease more slowly (forming an "elbow" shape).
+
+From the plot, identify the point where the inertia starts to decrease more slowly after a steep drop. This point is typically chosen as the optimal k.
+
+Step 5: Implementing KMeans clustering with the optimal k
+After determining the optimal k from the elbow plot, fit the KMeans model with that k.
+# Choose the optimal k (for example, from the elbow plot, let's say k=3)
+optimal_k = 3
+
+# Fit KMeans with the optimal k
+kmeans = KMeans(n_clusters=optimal_k, random_state=42)
+kmeans.fit(X_scaled)
+
+# Get cluster labels
+cluster_labels = kmeans.labels_
+
+# Add cluster labels to the original dataset (X)
+X_clustered = np.column_stack((X, cluster_labels))
+
+# Plot the clusters
+plt.figure(figsize=(8, 6))
+plt.scatter(X_clustered[:, 0], X_clustered[:, 1], c=cluster_labels, cmap='viridis')
+plt.xlabel('Petal length (cm)')
+plt.ylabel('Petal width (cm)')
+plt.title('Clustered Iris dataset')
+plt.show()
+
+Conclusion
+Scaling: Scaling the features (petal length and width) using StandardScaler helped improve the clustering results because K-means is distance-based and sensitive to feature scales.
+Optimal k: Determined using the elbow method from the inertia plot.
+Visualization: Visualized the clustered data to see how well K-means grouped the flowers based on petal features.
+This approach gives a clear method to cluster the Iris dataset based on petal features and determine the optimal number of clusters k using the elbow method.
